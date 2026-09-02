@@ -1,32 +1,182 @@
-# React + TypeScript + Vite
+# React-useRef-ScrollPositionApp
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Reactの `useRef` と `scrollIntoView()` を使って、ページ内のセクションへスクロールし、直前のセクションへ戻る処理を練習するアプリです。
 
-Currently, two official plugins are available:
+## 📌 概要
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+長いページを想定し、ボタンをクリックすることで特定のセクションへスクロールします。
 
-## React Compiler
+さらに、スクロールする前のセクションを `useRef` で保持し、「戻る」ボタンを押すことで前回の位置へ戻れるようにします。
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🛠 使用技術
 
-## Expanding the Oxlint configuration
+* React
+* TypeScript
+* Vite
+* Tailwind CSS
+* `useRef`
+* `scrollIntoView()`
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+## 📂 ディレクトリ構成
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```text
+React-useRef-ScrollPositionApp/
+├── src/
+│   ├── components/
+│   │   └── HandleScrollPosition.tsx
+│   ├── App.tsx
+│   ├── App.css
+│   ├── index.css
+│   └── main.tsx
+├── public/
+├── package.json
+├── vite.config.ts
+├── tsconfig.json
+└── README.md
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+## 💡 実装内容
+
+### セクションのDOMを参照
+
+`useRef` を使用して、各セクションのDOM要素を参照します。
+
+```tsx
+const section1 = useRef<HTMLDivElement | null>(null);
+const section2 = useRef<HTMLDivElement | null>(null);
+```
+
+JSX側では `ref` 属性に指定します。
+
+```tsx
+<div ref={section1}>
+  セクション1
+</div>
+```
+
+### セクションへスクロール
+
+`scrollIntoView()` を使用して、指定したセクションまでスクロールします。
+
+```tsx
+ref.current.scrollIntoView({
+  behavior: "smooth",
+});
+```
+
+`behavior: "smooth"` を指定することで、スムーズにスクロールできます。
+
+### 前回のセクションを保持
+
+`useRef` を使用して、スクロールする前のセクションを保持します。
+
+```tsx
+const prevScroll = useRef<HTMLDivElement | null>(null);
+```
+
+移動前に現在のセクションを保存します。
+
+```tsx
+prevScroll.current = section1.current;
+```
+
+### 前回の位置へ戻る
+
+保存しておいたDOM要素に対して `scrollIntoView()` を実行します。
+
+```tsx
+const scrollBack = () => {
+  prevScroll.current?.scrollIntoView({
+    behavior: "smooth",
+  });
+};
+```
+
+## 🎨 Tailwind CSS
+
+セクションには以下のクラスを使用しています。
+
+```tsx
+className="h-screen flex items-center justify-center"
+```
+
+| クラス              | 役割           |
+| ---------------- | ------------ |
+| `h-screen`       | 画面の高さいっぱいにする |
+| `flex`           | Flexboxを使用する |
+| `items-center`   | 縦方向に中央配置     |
+| `justify-center` | 横方向に中央配置     |
+
+ボタンには以下のクラスを使用しています。
+
+```tsx
+className="p-2 rounded text-white"
+```
+
+## 🎯 学習ポイント
+
+### 1. `useRef` によるDOM参照
+
+`useRef` を使用して、特定のDOM要素を直接参照する方法を学習します。
+
+### 2. `.current` の使い方
+
+`useRef` で取得した値は `.current` からアクセスします。
+
+```tsx
+section1.current
+```
+
+### 3. `scrollIntoView()` の使い方
+
+特定のDOM要素までスクロールする方法を学習します。
+
+```tsx
+element.scrollIntoView({
+  behavior: "smooth",
+});
+```
+
+### 4. `useState` と `useRef` の違い
+
+このアプリでは、画面表示のための状態管理ではなく、DOM要素を保持する目的で `useRef` を使用しています。
+
+| Hook       | 主な用途                        |
+| ---------- | --------------------------- |
+| `useState` | 状態を管理し、変更時に再レンダリング          |
+| `useRef`   | 値やDOM要素を保持し、変更しても再レンダリングしない |
+
+## 🚀 起動方法
+
+依存関係をインストールします。
+
+```bash
+npm install
+```
+
+開発サーバーを起動します。
+
+```bash
+npm run dev
+```
+
+表示されたURLへアクセスしてください。
+
+## 📝 動作
+
+1. 「セクション1へ」をクリック
+2. セクション1へスムーズにスクロール
+3. 「セクション2へ」をクリック
+4. セクション2へスムーズにスクロール
+5. 「戻る」をクリック
+6. 保存していた前回のセクションへ戻る
+
+## 📚 このアプリで学べること
+
+* `useRef` によるDOM参照
+* `useRef` の `.current`
+* `scrollIntoView()` の使い方
+* `behavior: "smooth"` によるスムーススクロール
+* `React.RefObject` の型付け
+* Tailwind CSSによるレイアウト
+* ReactでのDOM操作
